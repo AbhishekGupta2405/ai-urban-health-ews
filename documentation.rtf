@@ -1,0 +1,38 @@
+{\rtf1\ansi\deff0
+{\fonttbl{\f0 Arial;}{\f1 Arial Bold;}}
+{\colortbl;\red0\green0\blue0;\red30\green58\blue138;}
+\f1\fs32\cf2 Indore Urban Health Early Warning System (EWS) - Documentation\par
+\f0\fs24\cf1\par
+\f1\fs28 1. Overview\par
+\f0\fs24 This platform is an AI-powered disease surveillance and outbreak forecasting system specifically designed for Indore City. It integrates health, weather, and water quality data to monitor and predict disease risks across the city's 85 wards.\par
+\par
+\f1\fs28 2. Key Features\par
+\f0\fs24\bullet  \f1 Ward-Level Risk Scoring:\f0  Calculates risk scores (0-100) using XGBoost based on case growth, rainfall, and water quality.\par
+\bullet  \f1 Early Outbreak Detection:\f0  Uses Isolation Forest to identify unusual surges before they become official outbreaks.\par
+\bullet  \f1 7-Day Case Forecasting:\f0  Employs Facebook Prophet for time-series prediction of upcoming cases.\par
+\bullet  \f1 Interactive Risk Heatmap:\f0  Geospatial visualization of ward-wise risk levels for priority intervention.\par
+\bullet  \f1 Hospital Capacity Prediction:\f0  Predicts bed demand to prevent medical infrastructure shortages.\par
+\bullet  \f1 Scenario Simulation:\f0  Allows "What-If" analysis for environmental changes like rainfall or temperature spikes.\par
+\par
+\f1\fs28 3. Technical Architecture\par
+\f0\fs24\bullet  \f1 Frontend:\f0  Streamlit (Python-based interactive dashboard)\par
+\bullet  \f1 Backend/Models:\f0  XGBoost (Classification), Prophet (Forecasting), Scikit-learn (Anomaly Detection)\par
+\bullet  \f1 Data Processing:\f0  Custom ETL pipeline with fallback encoding for robust CSV ingestion.\par
+\par
+\f1\fs28 4. Project Structure\par
+\f0\fs24 - \f1 dashboard/app.py:\f0  Main UI application.\par
+- \f1 src/data_processing_indore.py:\f0  Data extraction and cleaning.\par
+- \f1 src/risk_model.py, forecasting.py, anomaly_detection.py:\f0  ML model logic.\par
+- \f1 models/:\f0  Storage for trained serialized models (.pkl).\par
+- \f1 data/raw/:\f0  Input datasets (Weather, Health, Water Quality).\par
+- \f1 data/processed/:\f0  Final datasets used by the models and dashboard.\par
+\par
+\f1\fs28 5. Setup and Execution\par
+\f0\fs24 1. Install dependencies: \f1 pip install -r requirements.txt\f0\par
+2. Run data pipeline: \f1 python src/data_processing_indore.py\f0\par
+3. Run ML training: \f1 python src/risk_model.py\f0  (and others in src/)\par
+4. Launch dashboard: \f1 streamlit run dashboard/app.py\f0\par
+\par
+\f1\fs28 6. Contact & Support\par
+\f0\fs24 Developed for the Indore Municipal Corporation | AI-Powered Disease Surveillance System | 2026\par
+}
