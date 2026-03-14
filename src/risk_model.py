@@ -5,7 +5,7 @@ import os
 
 def train_risk_model():
     # Load data
-    data = pd.read_csv("ai-urban-health-ews/data/processed/final_dataset.csv")
+    data = pd.read_csv("data/processed/final_dataset.csv")
     
     # Define features and target
     # Target was created in feature_engineering.py (outbreak_label)
@@ -26,11 +26,11 @@ def train_risk_model():
     data['risk_score'] = model.predict_proba(X)[:, 1] * 100
     
     # Save model
-    os.makedirs("ai-urban-health-ews/models", exist_ok=True)
-    joblib.dump(model, "ai-urban-health-ews/models/risk_model.pkl")
+    os.makedirs("models", exist_ok=True)
+    joblib.dump(model, "models/risk_model.pkl")
     
     # Save results
-    data.to_csv("ai-urban-health-ews/data/processed/final_dataset.csv", index=False)
+    data.to_csv("data/processed/final_dataset.csv", index=False)
     print("Risk prediction model trained. Saved to models/risk_model.pkl")
 
 if __name__ == "__main__":

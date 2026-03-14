@@ -5,7 +5,7 @@ import os
 
 def detect_anomalies():
     # Load feature engineered data
-    data = pd.read_csv("ai-urban-health-ews/data/processed/final_dataset.csv")
+    data = pd.read_csv("data/processed/final_dataset.csv")
     
     # Select features for anomaly detection
     features = ['case_count', 'growth_rate', 'bacteria_count', 'rainfall']
@@ -22,11 +22,11 @@ def detect_anomalies():
     data['is_anomaly'] = data['is_anomaly'].map({1: 0, -1: 1})
     
     # Save model
-    os.makedirs("ai-urban-health-ews/models", exist_ok=True)
-    joblib.dump(model, "ai-urban-health-ews/models/anomaly_detector.pkl")
+    os.makedirs("models", exist_ok=True)
+    joblib.dump(model, "models/anomaly_detector.pkl")
     
     # Save results
-    data.to_csv("ai-urban-health-ews/data/processed/final_dataset.csv", index=False)
+    data.to_csv("data/processed/final_dataset.csv", index=False)
     print("Anomaly detection complete. Model saved to models/anomaly_detector.pkl")
 
 if __name__ == "__main__":

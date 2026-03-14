@@ -72,7 +72,7 @@ def draw_footer():
 @st.cache_data
 def load_data():
     try:
-        df = pd.read_csv("ai-urban-health-ews/data/processed/final_dataset.csv")
+        df = pd.read_csv("data/processed/final_dataset.csv")
         df['date'] = pd.to_datetime(df['date'])
         return df
     except Exception as e:
@@ -81,7 +81,7 @@ def load_data():
 @st.cache_data
 def load_forecast():
     try:
-        df = pd.read_csv("ai-urban-health-ews/data/processed/city_forecast.csv")
+        df = pd.read_csv("data/processed/city_forecast.csv")
         df['ds'] = pd.to_datetime(df['ds'])
         return df
     except Exception as e:

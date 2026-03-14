@@ -12,8 +12,8 @@ def load_with_fallback(file_path):
     raise ValueError(f"Could not decode file {file_path} with common encodings.")
 
 def process_indore_data():
-    raw_path = "ai-urban-health-ews/data/raw"
-    processed_path = "ai-urban-health-ews/data/processed"
+    raw_path = "data/raw"
+    processed_path = "data/processed"
     os.makedirs(processed_path, exist_ok=True)
 
     print("Loading datasets...")

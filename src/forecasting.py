@@ -5,7 +5,7 @@ import os
 
 def forecast_cases():
     # Load data
-    data = pd.read_csv("ai-urban-health-ews/data/processed/final_dataset.csv")
+    data = pd.read_csv("data/processed/final_dataset.csv")
     data['date'] = pd.to_datetime(data['date'])
     
     # We will create a general city-wide forecast for now
@@ -18,15 +18,15 @@ def forecast_cases():
     model.fit(city_data)
     
     # Save model
-    os.makedirs("ai-urban-health-ews/models", exist_ok=True)
-    joblib.dump(model, "ai-urban-health-ews/models/forecasting_model.pkl")
+    os.makedirs("models", exist_ok=True)
+    joblib.dump(model, "models/forecasting_model.pkl")
     
     # Make future dataframe for 7 days
     future = model.make_future_dataframe(periods=7)
     forecast = model.predict(future)
     
     # Save forecast results
-    forecast[['ds', 'yhat', 'yhat_lower', 'yhat_upper']].to_csv("ai-urban-health-ews/data/processed/city_forecast.csv", index=False)
+    forecast[['ds', 'yhat', 'yhat_lower', 'yhat_upper']].to_csv("data/processed/city_forecast.csv", index=False)
     print("Forecasting complete. Model saved to models/forecasting_model.pkl")
 
 if __name__ == "__main__":
