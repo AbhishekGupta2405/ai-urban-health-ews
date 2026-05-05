@@ -1,4 +1,5 @@
-from fastapi import FastAPI, Body
+from fastapi import FastAPI, Body, HTTPException
+from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
 import pandas as pd
 import numpy as np
@@ -18,6 +19,19 @@ app.add_middleware(
 DATA_PATH = "data/processed/final_dataset.csv"
 FORECAST_PATH = "data/processed/city_forecast.csv"
 RISK_MODEL_PATH = "models/risk_model.pkl"
+
+PATIENT_RECORDS_PATH = "data/patient_records.csv"
+
+class PatientRecord(BaseModel):
+    patient_name: str
+    age: int
+    gender: str
+    diagnosis: str
+    address: str
+    ward_id: int
+    date: str
+    contact: str = ""
+    notes: str = ""
 
 # Global model variable
 risk_model = None
@@ -148,6 +162,91 @@ async def get_alerts():
     
     # Return as list of records
     return alerts_df.to_dict(orient='records')
+
+@app.post("/api/hospital/register")
+async def register_patient(record: PatientRecord):
+    """Register a new patient. Saves patient details and increments case count by 1."""
+    if not os.path.exists(DATA_PATH):
+        raise HTTPException(status_code=404, detail="Data file not found")
+        
+    try:
+        from datetime import datetime
+        
+        # 1. Save patient record to patient_records.csv
+        patient_dict = record.dict()
+        patient_dict['registered_at'] = datetime.now().isoformat()
+        
+        if os.path.exists(PATIENT_RECORDS_PATH):
+            patients_df = pd.read_csv(PATIENT_RECORDS_PATH)
+            patients_df = pd.concat([patients_df, pd.DataFrame([patient_dict])], ignore_index=True)
+        else:
+            patients_df = pd.DataFrame([patient_dict])
+        
+        patients_df.to_csv(PATIENT_RECORDS_PATH, index=False)
+        
+        # 2. Increment case_count by 1 in the main dataset
+        df = pd.read_csv(DATA_PATH)
+        df['date'] = pd.to_datetime(df['date'])
+        target_date = pd.to_datetime(record.date)
+        
+        mask = (df['ward_id'] == record.ward_id) & (df['date'] == target_date)
+        
+        if mask.any():
+            df.loc[mask, 'case_count'] += 1.0
+            df.loc[mask, 'disease'] = record.diagnosis
+        else:
+            ward_data = df[df['ward_id'] == record.ward_id].sort_values('date').tail(1)
+            if not ward_data.empty:
+                new_row = ward_data.copy()
+                new_row['date'] = target_date
+                new_row['case_count'] = 1.0
+                new_row['disease'] = record.diagnosis
+                df = pd.concat([df, new_row], ignore_index=True)
+            else:
+                raise HTTPException(status_code=400, detail=f"Ward {record.ward_id} not found in data")
+                
+        df.to_csv(DATA_PATH, index=False)
+        
+        total_patients = len(patients_df)
+        today_count = len(patients_df[patients_df['date'] == record.date]) if 'date' in patients_df.columns else 0
+        
+        return {
+            "message": f"Patient {record.patient_name} registered successfully",
+            "total_records": total_patients,
+            "today_registrations": today_count
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error: {str(e)}")
+
+@app.get("/api/hospital/records")
+async def get_patient_records(limit: int = 20):
+    """Get recent patient records."""
+    if not os.path.exists(PATIENT_RECORDS_PATH):
+        return []
+    
+    df = pd.read_csv(PATIENT_RECORDS_PATH)
+    return df.tail(limit).iloc[::-1].to_dict(orient='records')
+
+@app.get("/api/hospital/stats")
+async def get_hospital_stats():
+    """Get hospital dashboard stats."""
+    if not os.path.exists(PATIENT_RECORDS_PATH):
+        return {"total_patients": 0, "today_patients": 0, "diseases": {}}
+    
+    from datetime import date
+    df = pd.read_csv(PATIENT_RECORDS_PATH)
+    today = date.today().isoformat()
+    today_df = df[df['date'] == today] if 'date' in df.columns else pd.DataFrame()
+    
+    diseases = df['diagnosis'].value_counts().to_dict() if 'diagnosis' in df.columns else {}
+    
+    return {
+        "total_patients": len(df),
+        "today_patients": len(today_df),
+        "diseases": diseases
+    }
 
 if __name__ == "__main__":
     import uvicorn

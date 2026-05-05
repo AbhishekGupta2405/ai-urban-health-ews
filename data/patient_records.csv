@@ -1,0 +1,3 @@
+patient_name,age,gender,diagnosis,address,ward_id,date,contact,notes,registered_at
+Rajesh Kumar,34,Male,Dengue,"45 MG Road, Vijay Nagar",5,2026-05-06,9876543210,Fever and body ache,2026-05-06T01:27:14.416723
+Sharma,28,Female,Dengue,"12, Sapna Sangeeta Road",3,2026-05-05,9988776655,"High fever, rash",2026-05-06T01:35:44.598743

@@ -6,10 +6,8 @@ import {
   AlertTriangle, 
   Activity,
   Users,
-  ShieldCheck,
   Bell,
-  Menu,
-  ChevronRight,
+  ShieldCheck,
   Droplets,
   Thermometer,
   CloudRain,
@@ -34,7 +32,6 @@ const API_BASE_URL = 'http://localhost:8000/api';
 
 const App = () => {
   const [activeTab, setActiveTab] = useState('home');
-  const [sidebarOpen, setSidebarOpen] = useState(true);
   const [overviewData, setOverviewData] = useState<any>(null);
   const [forecastData, setForecastData] = useState<any[]>([]);
   const [wardData, setWardData] = useState<any[]>([]);
@@ -91,19 +88,14 @@ const App = () => {
     return "#ef4444"; // rose-500
   };
 
-  const NavItem = ({ id, icon: Icon, label }: { id: string; icon: any; label: string }) => (
-    <button
-      onClick={() => setActiveTab(id)}
-      className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${
-        activeTab === id 
-          ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30' 
-          : 'text-slate-500 hover:bg-slate-100'
-      }`}
-    >
-      <Icon size={20} />
-      {sidebarOpen && <span className="font-medium">{label}</span>}
-    </button>
-  );
+  const navItems = [
+    { id: 'home', icon: LayoutDashboard, label: 'Home' },
+    { id: 'overview', icon: Activity, label: 'Overview' },
+    { id: 'map', icon: MapIcon, label: 'Ward Map' },
+    { id: 'forecast', icon: TrendingUp, label: 'Forecast' },
+    { id: 'simulate', icon: Beaker, label: 'Simulate' },
+    { id: 'alerts', icon: AlertTriangle, label: 'Alerts' },
+  ];
 
   const StatCard = ({ title, value, delta, icon: Icon, color }: { title: string; value: any; delta?: number; icon: any; color: string }) => (
     <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
@@ -131,71 +123,54 @@ const App = () => {
   );
 
   return (
-    <div className="min-h-screen bg-slate-50 flex">
-      {/* Sidebar */}
-      <aside className={`${sidebarOpen ? 'w-64' : 'w-20'} bg-white border-r border-slate-200 transition-all duration-300 flex flex-col z-30`}>
-        <div className="p-6 flex items-center space-x-3 border-b border-slate-100">
-          <div className="bg-blue-600 p-2 rounded-lg">
-            <Activity className="text-white flex-shrink-0" size={24} />
-          </div>
-          {sidebarOpen && (
-            <div>
-              <h1 className="font-bold text-xl text-slate-800 tracking-tight leading-tight">Indore Health</h1>
-              <p className="text-xs text-slate-500 font-medium tracking-wide">DENGUE SURVEILLANCE</p>
+    <div className="min-h-screen bg-slate-50">
+      {/* Top Header with Navigation */}
+      <header className="bg-white border-b border-slate-200 sticky top-0 z-30">
+        <div className="max-w-7xl mx-auto px-6 flex items-center justify-between h-16">
+          {/* Logo */}
+          <div className="flex items-center space-x-3 flex-shrink-0">
+            <div className="bg-blue-600 p-2 rounded-lg">
+              <Activity className="text-white" size={20} />
             </div>
-          )}
-        </div>
-        
-        <nav className="flex-1 px-4 space-y-2 mt-4">
-          <NavItem id="home" icon={LayoutDashboard} label="Home" />
-          <NavItem id="overview" icon={Activity} label="Overview" />
-          <NavItem id="map" icon={MapIcon} label="Ward Risk Map" />
-          <NavItem id="forecast" icon={TrendingUp} label="Forecasting" />
-          <NavItem id="simulate" icon={Beaker} label="What-If Simulation" />
-          <NavItem id="alerts" icon={AlertTriangle} label="Alert Panel" />
-        </nav>
+            <div className="hidden sm:block">
+              <h1 className="font-bold text-lg text-slate-800 leading-tight">HealthSentinel AI</h1>
+              <p className="text-[10px] text-slate-400 font-semibold tracking-wider uppercase">Indore Urban Health EWS</p>
+            </div>
+          </div>
 
-        <div className="p-4 mt-auto">
-          <div className={`bg-slate-900 rounded-xl p-4 text-white relative overflow-hidden transition-all ${!sidebarOpen && 'hidden'}`}>
-            <div className="relative z-10">
-              <p className="text-xs text-slate-400 font-medium">SYSTEM STATUS</p>
-              <p className="text-sm font-bold mt-1">Monitoring Active</p>
-              <div className="flex items-center mt-3 text-xs text-emerald-400">
-                <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse mr-2" />
-                Live 2023 Analysis
-              </div>
-            </div>
-            <div className="absolute -right-4 -bottom-4 opacity-10">
-              <ShieldCheck size={80} />
-            </div>
+          {/* Nav Links */}
+          <nav className="flex items-center space-x-1">
+            {navItems.map(({ id, icon: Icon, label }) => (
+              <button
+                key={id}
+                onClick={() => setActiveTab(id)}
+                className={`flex items-center space-x-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  activeTab === id
+                    ? 'bg-blue-600 text-white shadow-sm'
+                    : 'text-slate-500 hover:bg-slate-100 hover:text-slate-700'
+                }`}
+              >
+                <Icon size={16} />
+                <span className="hidden lg:inline">{label}</span>
+              </button>
+            ))}
+          </nav>
+
+          {/* Right side */}
+          <div className="flex items-center space-x-3 flex-shrink-0">
+            <span className="hidden md:inline-block px-2.5 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-bold border border-blue-100">
+              2023 DATA
+            </span>
+            <button className="relative p-2 hover:bg-slate-100 rounded-lg text-slate-500">
+              <Bell size={18} />
+              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-rose-500 rounded-full border-2 border-white"></span>
+            </button>
           </div>
         </div>
-      </aside>
+      </header>
 
       {/* Main Content */}
-      <main className="flex-1 flex flex-col h-screen overflow-y-auto">
-        {/* Header */}
-        <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-8 sticky top-0 z-20">
-          <div className="flex items-center space-x-4">
-            <button onClick={() => setSidebarOpen(!sidebarOpen)} className="p-2 hover:bg-slate-100 rounded-lg text-slate-500">
-              <Menu size={20} />
-            </button>
-            <h2 className="text-lg font-bold text-slate-800 tracking-tight">
-              Indore Dengue Early Warning System
-            </h2>
-            <span className="hidden md:inline-block px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-700 text-xs font-bold border border-blue-100">
-              2023 DATASET
-            </span>
-          </div>
-          <div className="flex items-center space-x-4">
-            <button className="relative p-2 hover:bg-slate-100 rounded-lg text-slate-500">
-              <Bell size={20} />
-              <span className="absolute top-2 right-2 w-2 h-2 bg-rose-500 rounded-full border-2 border-white"></span>
-            </button>
-            <div className="h-8 w-8 rounded-full bg-slate-200 border border-slate-300"></div>
-          </div>
-        </header>
-
+      <main className="max-w-7xl mx-auto w-full">
         {/* Dashboard Content */}
         <div className="p-8 max-w-7xl mx-auto w-full">
           {activeTab === 'home' && (
@@ -214,7 +189,7 @@ const App = () => {
                   </div>
                   
                   <h1 className="text-4xl lg:text-6xl font-black text-white tracking-tight mb-6 leading-tight">
-                    AI-Driven Urban Health <br/>
+                    HealthSentinel AI <br/>
                     <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-emerald-400">
                       Early Warning System
                     </span>
@@ -228,7 +203,7 @@ const App = () => {
                     onClick={() => setActiveTab('overview')}
                     className="bg-white text-slate-900 hover:bg-blue-50 transition-all font-bold px-8 py-4 rounded-xl shadow-[0_0_40px_-10px_rgba(255,255,255,0.3)] flex items-center group"
                   >
-                    Launch Dashboard <ChevronRight className="ml-2 group-hover:translate-x-1 transition-transform" />
+                    Launch Dashboard <span className="ml-2 group-hover:translate-x-1 transition-transform inline-block">→</span>
                   </button>
                 </div>
               </div>
@@ -829,6 +804,7 @@ const App = () => {
               </div>
             </div>
           )}
+
         </div>
       </main>
     </div>

@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hospital Patient Registration</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg: #f8fafc;
+      --card: #ffffff;
+      --border: #e2e8f0;
+      --text: #0f172a;
+      --text-secondary: #64748b;
+      --text-muted: #94a3b8;
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --primary-light: #eff6ff;
+      --success: #16a34a;
+      --success-light: #f0fdf4;
+      --success-border: #bbf7d0;
+      --danger: #dc2626;
+      --danger-light: #fef2f2;
+      --danger-border: #fecaca;
+      --radius: 12px;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+    }
+
+    /* Header */
+    .header {
+      background: var(--card);
+      border-bottom: 1px solid var(--border);
+      padding: 0 32px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .header-icon {
+      width: 36px;
+      height: 36px;
+      background: var(--primary);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .header-icon svg { width: 20px; height: 20px; fill: none; stroke: white; stroke-width: 2; }
+    .header h1 { font-size: 18px; font-weight: 700; }
+    .header p { font-size: 12px; color: var(--text-muted); font-weight: 500; }
+
+    .status-badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: var(--success);
+      font-weight: 600;
+      background: var(--success-light);
+      padding: 6px 14px;
+      border-radius: 20px;
+      border: 1px solid var(--success-border);
+    }
+    .status-dot {
+      width: 7px; height: 7px;
+      background: var(--success);
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+    /* Layout */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 32px;
+    }
+
+    /* Stats Row */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+    .stat-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+    }
+    .stat-card .label {
+      font-size: 12px;
+      color: var(--text-muted);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .stat-card .value {
+      font-size: 32px;
+      font-weight: 700;
+      margin-top: 4px;
+      color: var(--text);
+    }
+
+    /* Main grid */
+    .main-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      align-items: start;
+    }
+    @media (max-width: 900px) {
+      .main-grid { grid-template-columns: 1fr; }
+    }
+
+    /* Card */
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .card-header {
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .card-header h2 {
+      font-size: 16px;
+      font-weight: 600;
+    }
+    .card-header .icon-wrap {
+      width: 32px; height: 32px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .card-header .icon-wrap svg { width: 18px; height: 18px; stroke-width: 2; fill: none; }
+
+    .card-body { padding: 24px; }
+
+    /* Form */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    .form-group.full { grid-column: 1 / -1; }
+
+    .form-group label {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-secondary);
+    }
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      height: 42px;
+      padding: 0 14px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      font-size: 14px;
+      font-family: inherit;
+      color: var(--text);
+      background: var(--bg);
+      outline: none;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    .form-group textarea {
+      height: 70px;
+      padding: 10px 14px;
+      resize: none;
+    }
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+
+    .btn-submit {
+      margin-top: 20px;
+      width: 100%;
+      height: 46px;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.1s;
+    }
+    .btn-submit:hover { background: var(--primary-hover); }
+    .btn-submit:active { transform: scale(0.985); }
+    .btn-submit:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    /* Toast */
+    .toast {
+      padding: 14px 18px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 500;
+      margin-bottom: 16px;
+      display: none;
+      align-items: flex-start;
+      gap: 10px;
+      line-height: 1.5;
+    }
+    .toast.show { display: flex; animation: slideIn 0.3s ease; }
+    .toast.success { background: var(--success-light); color: #166534; border: 1px solid var(--success-border); }
+    .toast.error { background: var(--danger-light); color: #991b1b; border: 1px solid var(--danger-border); }
+    .toast svg { flex-shrink: 0; margin-top: 1px; }
+    @keyframes slideIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* Records table */
+    .records-list { max-height: 580px; overflow-y: auto; }
+    .record-item {
+      padding: 14px 24px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      transition: background 0.15s;
+    }
+    .record-item:hover { background: #f8fafc; }
+    .record-item:last-child { border-bottom: none; }
+    .record-info { flex: 1; min-width: 0; }
+    .record-name { font-size: 14px; font-weight: 600; }
+    .record-meta { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+    .record-badge {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 6px;
+      background: var(--primary-light);
+      color: var(--primary);
+      white-space: nowrap;
+    }
+    .empty-state {
+      padding: 48px 24px;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 14px;
+    }
+    .empty-state svg {
+      margin-bottom: 12px;
+      opacity: 0.4;
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="header-left">
+      <div class="header-icon">
+        <svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div>
+        <h1>Hospital Patient Registration</h1>
+        <p>Indore Municipal Health Network</p>
+      </div>
+    </div>
+    <div class="status-badge">
+      <span class="status-dot"></span>
+      Connected to EWS
+    </div>
+  </header>
+
+  <div class="container">
+    <!-- Stats -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="label">Total Registrations</div>
+        <div class="value" id="stat-total">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Today's Patients</div>
+        <div class="value" id="stat-today">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Top Diagnosis</div>
+        <div class="value" id="stat-disease" style="font-size:20px;">—</div>
+      </div>
+    </div>
+
+    <!-- Main Grid -->
+    <div class="main-grid">
+      <!-- Registration Form -->
+      <div class="card">
+        <div class="card-header">
+          <div class="icon-wrap" style="background:#eff6ff;">
+            <svg viewBox="0 0 24 24" stroke="#2563eb"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="7" r="4" stroke-linecap="round" stroke-linejoin="round"/><line x1="19" y1="8" x2="19" y2="14" stroke-linecap="round"/><line x1="22" y1="11" x2="16" y2="11" stroke-linecap="round"/></svg>
+          </div>
+          <h2>New Patient Registration</h2>
+        </div>
+        <div class="card-body">
+          <div id="toast" class="toast"></div>
+          <form id="patientForm" onsubmit="submitForm(event)">
+            <div class="form-grid">
+              <div class="form-group full">
+                <label>Patient Full Name *</label>
+                <input type="text" id="patient_name" required placeholder="e.g. Rajesh Kumar" />
+              </div>
+              <div class="form-group">
+                <label>Age *</label>
+                <input type="number" id="age" min="0" max="120" required placeholder="e.g. 34" />
+              </div>
+              <div class="form-group">
+                <label>Gender *</label>
+                <select id="gender" required>
+                  <option value="">Select</option>
+                  <option>Male</option>
+                  <option>Female</option>
+                  <option>Other</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Diagnosis / Disease *</label>
+                <select id="diagnosis" required>
+                  <option value="">Select</option>
+                  <option>Dengue</option>
+                  <option>Malaria</option>
+                  <option>Chikungunya</option>
+                  <option>Cholera</option>
+                  <option>Typhoid</option>
+                  <option>Leptospirosis</option>
+                  <option>Other</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Ward No. *</label>
+                <select id="ward_id" required>
+                  <option value="">Select Ward</option>
+                </select>
+              </div>
+              <div class="form-group full">
+                <label>Address *</label>
+                <input type="text" id="address" required placeholder="e.g. 45, MG Road, Vijay Nagar" />
+              </div>
+              <div class="form-group">
+                <label>Contact Number</label>
+                <input type="tel" id="contact" placeholder="e.g. 9876543210" />
+              </div>
+              <div class="form-group">
+                <label>Date *</label>
+                <input type="date" id="date" required />
+              </div>
+              <div class="form-group full">
+                <label>Notes / Symptoms</label>
+                <textarea id="notes" placeholder="Brief clinical notes..."></textarea>
+              </div>
+            </div>
+            <button type="submit" class="btn-submit" id="submitBtn">Register Patient</button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Recent Records -->
+      <div class="card">
+        <div class="card-header">
+          <div class="icon-wrap" style="background:#f0fdf4;">
+            <svg viewBox="0 0 24 24" stroke="#16a34a"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke-linecap="round" stroke-linejoin="round"/><polyline points="14 2 14 8 20 8" stroke-linecap="round" stroke-linejoin="round"/><line x1="16" y1="13" x2="8" y2="13" stroke-linecap="round"/><line x1="16" y1="17" x2="8" y2="17" stroke-linecap="round"/></svg>
+          </div>
+          <h2>Recent Registrations</h2>
+        </div>
+        <div class="records-list" id="recordsList">
+          <div class="empty-state">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke-linecap="round" stroke-linejoin="round"/><polyline points="14 2 14 8 20 8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <p>No patient records yet.<br/>Register a patient to get started.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API = 'http://localhost:8000/api';
+
+    // Populate ward dropdown
+    const wardSelect = document.getElementById('ward_id');
+    for (let i = 1; i <= 85; i++) {
+      const opt = document.createElement('option');
+      opt.value = i;
+      opt.textContent = `Ward ${i}`;
+      wardSelect.appendChild(opt);
+    }
+
+    // Set today's date
+    document.getElementById('date').value = new Date().toISOString().split('T')[0];
+
+    // Load initial data
+    loadStats();
+    loadRecords();
+
+    async function loadStats() {
+      try {
+        const res = await fetch(`${API}/hospital/stats`);
+        const data = await res.json();
+        document.getElementById('stat-total').textContent = data.total_patients || 0;
+        document.getElementById('stat-today').textContent = data.today_patients || 0;
+        const diseases = data.diseases || {};
+        const topDisease = Object.keys(diseases).sort((a, b) => diseases[b] - diseases[a])[0];
+        document.getElementById('stat-disease').textContent = topDisease || '—';
+      } catch (e) {
+        console.error('Stats error:', e);
+      }
+    }
+
+    async function loadRecords() {
+      try {
+        const res = await fetch(`${API}/hospital/records?limit=15`);
+        const records = await res.json();
+        const list = document.getElementById('recordsList');
+
+        if (!records.length) return;
+
+        list.innerHTML = records.map(r => `
+          <div class="record-item">
+            <div class="record-info">
+              <div class="record-name">${r.patient_name || 'Unknown'}</div>
+              <div class="record-meta">${r.age || '?'}y, ${r.gender || '?'} · Ward ${r.ward_id} · ${r.date || ''}</div>
+            </div>
+            <span class="record-badge">${r.diagnosis || '—'}</span>
+          </div>
+        `).join('');
+      } catch (e) {
+        console.error('Records error:', e);
+      }
+    }
+
+    function showToast(type, msg) {
+      const toast = document.getElementById('toast');
+      const icon = type === 'success'
+        ? '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" stroke-linecap="round" stroke-linejoin="round"/><polyline points="22 4 12 14.01 9 11.01" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+        : '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12" stroke-linecap="round"/><line x1="12" y1="16" x2="12.01" y2="16" stroke-linecap="round"/></svg>';
+      toast.className = `toast show ${type}`;
+      toast.innerHTML = `${icon}<span>${msg}</span>`;
+      setTimeout(() => { toast.classList.remove('show'); }, 5000);
+    }
+
+    async function submitForm(e) {
+      e.preventDefault();
+      const btn = document.getElementById('submitBtn');
+      btn.disabled = true;
+      btn.textContent = 'Registering...';
+
+      const payload = {
+        patient_name: document.getElementById('patient_name').value.trim(),
+        age: parseInt(document.getElementById('age').value),
+        gender: document.getElementById('gender').value,
+        diagnosis: document.getElementById('diagnosis').value,
+        address: document.getElementById('address').value.trim(),
+        ward_id: parseInt(document.getElementById('ward_id').value),
+        date: document.getElementById('date').value,
+        contact: document.getElementById('contact').value.trim(),
+        notes: document.getElementById('notes').value.trim()
+      };
+
+      try {
+        const res = await fetch(`${API}/hospital/register`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        if (!res.ok) {
+          const err = await res.json();
+          throw new Error(err.detail || 'Registration failed');
+        }
+
+        const result = await res.json();
+        showToast('success', `${result.message}. Total records: ${result.total_records}`);
+
+        // Reset form but keep date and ward
+        const keepDate = document.getElementById('date').value;
+        const keepWard = document.getElementById('ward_id').value;
+        document.getElementById('patientForm').reset();
+        document.getElementById('date').value = keepDate;
+        document.getElementById('ward_id').value = keepWard;
+
+        loadStats();
+        loadRecords();
+      } catch (err) {
+        showToast('error', err.message || 'Failed to register patient. Is the backend running?');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Register Patient';
+      }
+    }
+  </script>
+</body>
+</html>
