@@ -682,7 +682,7 @@ const App = () => {
                 {/* Controls */}
                 <div className="lg:col-span-1 bg-white p-8 rounded-2xl border border-slate-100 shadow-sm space-y-6">
                   <h3 className="font-bold text-lg text-slate-800 flex items-center mb-4">
-                    <Menu className="mr-2 text-blue-600" size={20} />
+                    <Beaker className="mr-2 text-blue-600" size={20} />
                     Simulation Parameters
                   </h3>
                   
